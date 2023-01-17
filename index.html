@@ -1,57 +1,328 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Bitnami: Open Source. Simplified</title>
-<link href="bitnami.css" media="all" rel="Stylesheet" type="text/css" />
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=xrv3qxunpk&submodules=geocoder"></script>
+	<script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.4/xlsx.full.min.js"></script>
+    <script src="cctvinfo.js"></script>
+    <style>
+        .container {
+          display: flex;
+        }
+        .address {
+          width: 400px;
+        }
+        .map {
+          flex: 1;
+        }
+    </style>
 </head>
+
 <body>
-<div id="container">
-  <div id="header"> 
-    <div id="bitnami">
-        <a href="/"><img alt="Bitnami" src="img/bitnami.png?1186088387" /></a>
-    </div>
-  </div>
-    <div id="menu_launch_page">
-      <table cellpadding="0" cellspacing="0">
-        <tr>
-          <td><img src="img/tab1_welcome.png" alt="" /></td>
-        </tr>
-      </table>
-    </div>
-  <div id="lowerContainer">
-    <div id="content">
-        <div align="center">
-<table class="tableParagraph">
-<tr>
-<td class="container">
-<img align="left" src="img/wampstack.png" alt="Bitnami WAMP Stack"/>
-<p>We created the Bitnami Project to help spread the adoption of freely
-available, high quality Open Source web applications. Bitnami aims to make
-it easier than ever to discover, download and install Open Source software such 
-as document and content management systems, wikis and blogging software.<br/><br/>
-
-You can learn more about Bitnami at <a href="https://bitnami.com">https://bitnami.com</a><br/><br/>
-
-The Bitnami WAMP Stack is an easy to install
-software platform that greatly simplifies the deployment of Open Source web
-stacks. It includes ready-to-run versions of
-Apache, MySQL and PHP. Bitnami WAMP Stack is
-distributed for free under the Apache 2.0 license.<br/><br/> 
-To get started with Bitnami WAMP Stack we suggest the following:<br/><br/>
-
-
-<b>1.- <a target="_blank" href="https://docs.bitnami.com/installer/infrastructure/wamp/">Check our documentation</a></b>. The stack is self-contained and independent on your system, you can find all components in your installation directory: C:/Bitnami/wampstack-8.0.3-2<br/><br/>
-<b>2.- <a target="_blank" href="https://docs.bitnami.com/installer/infrastructure/wamp/administration/control-services-linux/">Start the servers.</a></b> Open the graphical "Manager" tool in your installation directory to start &amp; stop the installed servers. You can also use "ctlscript.sh" from the command line prompt. <br/><br/>
-<b>3.- <a target="_blank" href="https://docs.bitnami.com/installer/infrastructure/wamp/administration/create-custom-application-php/">Deploy your own project</a></b>.
-</p>
-</td>
-</tr>
-</table>
+<div class="container">
+    <div class="address">
+        <div>
+            <input id="address" type="text" placeholder="검색할 주소">
+            <input id="submit" type="button" value="주소검색">
         </div>
-        <br/><br/>
-   </div>
-  </div>
+        <div id="ccinfo">
+            <table>
+                <!-- <thead>
+                    <tr>
+                        <th>주소</th>
+                        <th>위도</th>
+                        <th>경도</th>
+                    </tr>	
+                </thead> -->
+                <tbody id="mapList"></tbody>
+            </table>
+        </div>
+    </div>
+    <div id="map" style="width:100%;height:800px;"></div>
+    <!-- <div class="map">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d14031.989325170897!2d-96.83778191860588!3d32.82750374779111!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x6a8a21f1f6a91e6e!2sThe+White+House!5e0!3m2!1sen!2sus!4v1589407967761!5m2!1sen!2sus" width="600" height="450" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+    </div> -->
 </div>
 </body>
+
+<script>
+///////////////////////////////////////////////////////////////////
+// 지도의 높이를 브라우저에 꽉차게
+function setMapHeight() {
+  // Get the height of the browser window
+  var windowHeight = window.innerHeight-20;
+
+  // Set the height of the map element to the window height
+  document.getElementById('map').style.height = windowHeight + 'px';
+}
+
+// Set the map height when the page loads
+setMapHeight();
+
+// Set the map height again if the window is resized
+window.addEventListener('resize', setMapHeight);
+///////////////////////////////////////////////////////////////////
+
+// 전역 변수
+var map = new naver.maps.Map('map', {
+	    center: new naver.maps.LatLng(37.5745240, 127.0396500), // 동대문구청
+	    zoom: 15
+	});  
+var markers = new Array(); // 마커 정보를 담는 배열
+var infoWindows = new Array(); // 정보창을 담는 배열
+//
+
+$(function() {
+  initMap();
+});
+
+
+var areaArr = new Array();  // 지역을 담는 배열 ( 지역명/위도경도 )
+function initMap() { 
+  pushData(areaArr)
+  
+  for (var i = 0; i < areaArr.length; i++) {
+      // 지역을 담은 배열의 길이만큼 for문으로 마커와 정보창을 채워주자 !
+
+      var marker = new naver.maps.Marker({
+          map: map,
+          title: areaArr[i].location, // 지역구 이름 
+          position: new naver.maps.LatLng(areaArr[i].lat , areaArr[i].lng) // 지역구의 위도 경도 넣기 
+      });
+      
+      /* 정보창 */
+       var infoWindow = new naver.maps.InfoWindow({
+        content: '<div style="width:400px;text-align:center;padding:10px;"><b>' + areaArr[i].location + '</b><br>' + 
+            '( ' + areaArr[i].lat + ', ' + areaArr[i].lng + ' )',
+        // content: '<div style="width:200px;text-align:center;padding:10px;"><b>' + areaArr[i].location + '</b><br> - naver map - </div>'
+       }); // 클릭했을 때 띄워줄 정보 HTML 작성
+      
+       markers.push(marker); // 생성한 마커를 배열에 담는다.
+       infoWindows.push(infoWindow); // 생성한 정보창을 배열에 담는다.
+  }
+  
+  function getClickHandler(seq) {
+      
+          return function(e) {  // 마커를 클릭하는 부분
+            // console.log('getClickHandler: seq: '+ seq)
+              var marker = markers[seq], // 클릭한 마커의 시퀀스로 찾는다.
+                  infoWindow = infoWindows[seq]; // 클릭한 마커의 시퀀스로 찾는다
+
+              if (infoWindow.getMap()) {
+                  infoWindow.close();
+              } else {
+                  infoWindow.open(map, marker); // 표출
+              }
+              displayCcinfo(seq)
+          }
+  }
+  
+  for (var i=0, ii=markers.length; i<ii; i++) {
+    //   console.log(markers[i] , getClickHandler(i));
+      naver.maps.Event.addListener(markers[i], 'click', getClickHandler(i)); // 클릭한 마커 핸들러
+  }
+}
+
+
+//검색한 주소의 정보를 insertAddress 함수로 넘겨준다.
+function searchAddressToCoordinate(address) {
+    naver.maps.Service.geocode({
+        query: address
+    }, function(status, response) {
+        if (status === naver.maps.Service.Status.ERROR) {
+            return alert('Something Wrong!');
+        }
+        if (response.v2.meta.totalCount === 0) {
+            return alert('올바른 주소를 입력해주세요.');
+        }
+        var htmlAddresses = [],
+            item = response.v2.addresses[0],
+            point = new naver.maps.Point(item.x, item.y);
+        if (item.roadAddress) {
+            htmlAddresses.push('[도로명 주소] ' + item.roadAddress);
+        }
+        if (item.jibunAddress) {
+            htmlAddresses.push('[지번 주소] ' + item.jibunAddress);
+        }
+        if (item.englishAddress) {
+            htmlAddresses.push('[영문명 주소] ' + item.englishAddress);
+        }
+
+        insertAddress(item.roadAddress, item.x, item.y);
+        
+    });
+}
+
+function searchMarker(name) {
+    for (var i = 0; i < markers.length; i++) {
+        // console.log(markers[i].title+' : '+name)
+        if (markers[i].title == name) {
+            return i
+        }
+    } 
+    return -1;
+}
+
+// 주소 검색의 이벤트
+$('#address').on('keydown', function(e) {
+    // console.log('keydown')
+    var keyCode = e.which;
+    if (keyCode === 13) { // Enter Key
+        let ret = searchMarker($('#address').val());
+        if ( ret == -1)
+            searchAddressToCoordinate($('#address').val());
+        else {
+            map.setCenter(markers[ret].position);
+            displayCcinfo(ret)
+            // 정보창 click effect
+        }
+    }
+});
+$('#submit').on('click', function(e) {
+    e.preventDefault();
+    let ret = searchMarker($('#address').val());
+    if ( ret == -1)
+        searchAddressToCoordinate($('#address').val());
+    else {
+        map.setCenter(markers[ret].position);
+        displayCcinfo(ret)
+        // 정보창 click effect
+    }
+});
+// searchAddressToCoordinate('천호대로 145');
+
+// function initGeocoder() {
+//     map.addListener('click', function(e) {
+//         searchCoordinateToAddress(e.coord);
+//     });
+
+//     $('#address').on('keydown', function(e) {
+//         var keyCode = e.which;
+
+//         if (keyCode === 13) { // Enter Key
+//             searchAddressToCoordinate($('#address').val());
+//         }
+//     });
+
+//     $('#submit').on('click', function(e) {
+//         e.preventDefault();
+
+//         searchAddressToCoordinate($('#address').val());
+//     });
+
+//     searchAddressToCoordinate('천호대로 145');
+// }
+
+// naver.maps.Event.once(map, 'init_stylemap', initGeocoder);
+
+
+    
+//검색정보를 테이블로 작성해주고, 지도에 마커를 찍어준다.
+function insertAddress(address, latitude, longitude) {
+	var mapList = "";
+	mapList += "<tr>"
+	mapList += "	<td>" + address + "</td>"
+	mapList += "	<td>" + latitude + "</td>"
+	mapList += "	<td>" + longitude + "</td>"
+	mapList += "</tr>"
+
+	// $('#mapList').append(mapList);	
+	//  $('#mapList').html(mapList);	
+	$('#mapList').empty().append(mapList);	
+
+	// var map = new naver.maps.Map('map', {
+	//     center: new naver.maps.LatLng(longitude, latitude),
+	//     zoom: 14
+	// });
+    moveMap(longitude, latitude)
+    
+    // var marker = new naver.maps.Marker({
+    //     map: map,
+    //     position: new naver.maps.LatLng(longitude, latitude),
+    // });
+}
+
+    
+//검색정보를 테이블로 작성해주고, 지도에 마커를 찍어준다.
+function displayCcinfo(seq) {
+// console.log('seq: '+ seq)
+	var mapList = "";
+	mapList += "<tr>"
+	mapList += "	<td>" + areaArr[seq].lat + "</td>"
+	mapList += "	<td>" + areaArr[seq].lng + "</td>"
+	mapList += "</tr>"
+
+    var new_lat = areaArr[seq].lat.slice(0, areaArr[seq].lat.indexOf(".") + 7);
+
+	mapList += "<tr>"
+	mapList += "	<td>" + '관리번호: ' + "</td>"
+	mapList += "	<td>" + new_lat + "</td>"
+	mapList += "</tr>"
+
+	// $('#mapList').append(mapList);	
+	//  $('#mapList').html(mapList);	
+	$('#mapList').empty().append(mapList);	
+
+	// var map = new naver.maps.Map('map', {
+	//     center: new naver.maps.LatLng(longitude, latitude),
+	//     zoom: 14
+	// });
+
+    // moveMap(areaArr[seq].lat, areaArr[seq].lng)
+    
+    // var marker = new naver.maps.Marker({
+    //     map: map,
+    //     position: new naver.maps.LatLng(longitude, latitude),
+    // });
+}
+
+
+// 지도를 이동하게 해주는 함수
+function moveMap(lon, lat) {
+	var mapOptions = {
+		    center: new naver.maps.LatLng(lon, lat),
+		    zoom: 15,
+		    mapTypeControl: true
+		};
+    // var map = new naver.maps.Map('map', mapOptions);
+    map.setCenter(new naver.maps.LatLng(lon, lat));
+    map.setZoom(15);
+    // var marker = new naver.maps.Marker({
+    //     position: new naver.maps.LatLng(lon, lat),
+    //     map: map
+    // });
+}
+
+
+function search(query) {
+  const endpoint = 'https://naveropenapi.apigw.ntruss.com/map-place/v1/search';
+  const params = {
+    query: query,
+    type: 'building', // search for buildings only
+  };
+  const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
+  const url = `${endpoint}?${queryString}`;
+  
+  const headers = new Headers();
+  const API_KEY_ID = 'xrv3qxunpk ';
+  const API_KEY = '3waRg77cyWgk9bZCx3mkrEqJ9fdNOPfoY4CYUhJa ';
+  headers.append('X-NCP-APIGW-API-KEY-ID', API_KEY_ID);
+  headers.append('X-NCP-APIGW-API-KEY', API_KEY_ID);
+
+  return fetch(url, { headers })
+    .then(response => response.json())
+    .then(data => data.places);
+}
+
+
+// search('City Hall').then(places => {
+//   console.log(places); // an array of places matching the search query
+// });
+
+
+</script>
 </html>
