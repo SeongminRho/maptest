@@ -115,8 +115,18 @@ function initMap() {
             icon: {
                 // content: '<svg width="28" height="37" viewBox="0 0 28 37" xmlns="http://www.w3.org/2000/svg"><path d="M14 0C6.268 0 0 6.268 0 14c0 7.732 6.268 14 14 14 7.732 0 14-6.268 14-14C28 6.268 21.732 0 14 0zM14 26.946c-4.135 0-7.5-3.365-7.5-7.5s3.365-7.5 7.5-7.5 7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5z" fill="#ff00ff"/></svg>',
                 // content: '<svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg"> <path d="M15,0L15,40L30,20Z" fill="blue"/></svg>',
-                content: '<svg width="24" height="24" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg"> <path d="M15,40C6.71572875,40,0,33.2842712,0,25C0,16.7157288,6.71572875,10,15,10C23.2842712,10,30,16.7157288,30,25C30,33.2842712,23.2842712,40,15,40ZM15,10L15,0L15,10Z" '+
-                    'fill=' + colorList[areaArr[i].color] + '/> </svg>',
+
+                // content: '<svg width="24" height="24" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg"> <path d="M15,40C6.71572875,40,0,33.2842712,0,25C0,16.7157288,6.71572875,10,15,10C23.2842712,10,30,16.7157288,30,25C30,33.2842712,23.2842712,40,15,40ZM15,10L15,0L15,10Z" '+
+                //     'fill=' + colorList[areaArr[i].color] + '/> </svg>',
+                content: '<svg width="20" height="20"> '+
+                    // '<rect x="0" y="0" width="20" height="20" fill=' + colorList[areaArr[i].color] + '/>' +
+                    '<circle cx="10" cy="10" r="10" fill=' + colorList[areaArr[i].color] + '/>' +
+                    '<circle cx="10" cy="15" r="5" fill="white" /> '+
+                    '<circle cx="12" cy="15" r="1" fill="black" /> '+
+                    '<circle cx="8" cy="15" r="1" fill="black" /> '+
+                    '</svg>',
+                    
+
                 // content: '<svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg"><path d="M15,40C6.71572875,40,0,33.2842712,0,25C0,16.7157288,6.71572875,10,15,10C23.2842712,10,30,16.7157288,30,25C30,33.2842712,23.2842712,40,15,40ZM15,20C8.28643375,20,3,15.2864338,3,8C3,0.71356617,8.28643375,0,15,0C21.7135662,0,27,0.71356617,27,8C27,15.2864338,21.7135662,20,15,20Z" fill="blue"/></svg>',
                 // content: '<svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg"><path d="M15,40C6.71572875,40,0,33.2842712,0,25C0,16.7157288,6.71572875,10,15,10C23.2842712,10,30,16.7157288,30,25C30,33.2842712,23.2842712,40,15,40ZM15,0C8.28643375,0,3,5.28643375,3,12C3,18.7135662,8.28643375,24,15,24C21.7135662,24,27,18.7135662,27,12C27,5.28643375,21.7135662,0,15,0Z" fill="white"/><path d="M15,20C12.790861,20,11,18.209139,11,16C11,13.790861,12.790861,12,15,12C17.209139,12,19,13.790861,19,16C19,18.209139,17.209139,20,15,20Z" fill="blue"/></svg>',
                 size: new naver.maps.Size(24, 24),
@@ -127,7 +137,7 @@ function initMap() {
 
       /* 정보창 */
        var infoWindow = new naver.maps.InfoWindow({
-        content: '<div style="width:400px;text-align:center;padding:10px;"><b>' + areaArr[i].location + '</b><br>' + 
+        content: '<div style="width:320px;text-align:center;padding:10px;"><b>' + areaArr[i].location + '</b><br>' + 
             '( ' + areaArr[i].lat + ', ' + areaArr[i].lng + ' )',
         // content: '<div style="width:200px;text-align:center;padding:10px;"><b>' + areaArr[i].location + '</b><br> - naver map - </div>'
        }); // 클릭했을 때 띄워줄 정보 HTML 작성
