@@ -110,6 +110,7 @@ function initMap() {
     for (var i = 0; i < areaArr.length; i++) {
       // 지역을 담은 배열의 길이만큼 for문으로 마커와 정보창을 채워주자 !
         var marker = new naver.maps.Marker({
+            title: areaArr[i].location, // 지역구 이름 
             position: new naver.maps.LatLng(areaArr[i].lat , areaArr[i].lng), // 지역구의 위도 경도 넣기 
             map: map,
             icon: {
@@ -118,12 +119,14 @@ function initMap() {
 
                 // content: '<svg width="24" height="24" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg"> <path d="M15,40C6.71572875,40,0,33.2842712,0,25C0,16.7157288,6.71572875,10,15,10C23.2842712,10,30,16.7157288,30,25C30,33.2842712,23.2842712,40,15,40ZM15,10L15,0L15,10Z" '+
                 //     'fill=' + colorList[areaArr[i].color] + '/> </svg>',
+
+                // content: '<div style="background-color:'+'#ffa500'+';">'+areaArr[i].location+'</div>',
+                    
                 content: '<svg width="20" height="20"> '+
-                    // '<rect x="0" y="0" width="20" height="20" fill=' + colorList[areaArr[i].color] + '/>' +
                     '<circle cx="10" cy="10" r="10" fill=' + colorList[areaArr[i].color] + '/>' +
-                    '<circle cx="10" cy="15" r="5" fill="white" /> '+
-                    '<circle cx="12" cy="15" r="1" fill="black" /> '+
-                    '<circle cx="8" cy="15" r="1" fill="black" /> '+
+                    '<circle cx="10" cy="10" r="5" fill="white" /> '+
+                    '<circle cx="12" cy="10" r="1" fill="black" /> '+
+                    '<circle cx="8" cy="10" r="1" fill="black" /> '+
                     '</svg>',
                     
 
@@ -200,8 +203,10 @@ function searchAddressToCoordinate(address) {
 
 function searchMarker(name) {
     for (var i = 0; i < markers.length; i++) {
-        // console.log(markers[i].title+' : '+name)
+        console.log(i)
+        console.log(markers[i].title+' : '+name)
         if (markers[i].title == name) {
+            console.log(markers[i].title+' ::::::::::::::: '+name)
             return i
         }
     } 
