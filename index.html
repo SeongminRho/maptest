@@ -104,37 +104,70 @@ var colorList = [
 '"#ffa500"',  // 15(orange)
 ]
 var areaArr = new Array();  // 지역을 담는 배열 ( 지역명/위도경도 )
+var userMarker = null;
+
 function initMap() { 
     loadData(areaArr)
   
     for (var i = 0; i < areaArr.length; i++) {
       // 지역을 담은 배열의 길이만큼 for문으로 마커와 정보창을 채워주자 !
+        // var marker = new naver.maps.Marker({
+        //     title: areaArr[i].location, // 지역구 이름 
+        //     position: new naver.maps.LatLng(areaArr[i].lat , areaArr[i].lng), // 지역구의 위도 경도 넣기 
+        //     map: map,
+        //     icon: {
+        //         // content: '<svg width="28" height="37" viewBox="0 0 28 37" xmlns="http://www.w3.org/2000/svg"><path d="M14 0C6.268 0 0 6.268 0 14c0 7.732 6.268 14 14 14 7.732 0 14-6.268 14-14C28 6.268 21.732 0 14 0zM14 26.946c-4.135 0-7.5-3.365-7.5-7.5s3.365-7.5 7.5-7.5 7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5z" fill="#ff00ff"/></svg>',
+        //         // content: '<svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg"> <path d="M15,0L15,40L30,20Z" fill="blue"/></svg>',
+
+        //         // content: '<svg width="24" height="24" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg"> <path d="M15,40C6.71572875,40,0,33.2842712,0,25C0,16.7157288,6.71572875,10,15,10C23.2842712,10,30,16.7157288,30,25C30,33.2842712,23.2842712,40,15,40ZM15,10L15,0L15,10Z" '+
+        //         //     'fill=' + colorList[areaArr[i].color] + '/> </svg>',
+
+        //         // content: '<div style="background-color:'+'#ffa500'+';">'+areaArr[i].location+'</div>',
+                    
+        //         content: '<svg width="20" height="20"> '+
+        //             '<circle cx="10" cy="10" r="10" fill=' + colorList[areaArr[i].color] + '/>' +
+        //             '<circle cx="10" cy="10" r="5" fill="white" /> '+
+        //             '<circle cx="12" cy="10" r="1" fill="black" /> '+
+        //             '<circle cx="8" cy="10" r="1" fill="black" /> '+
+        //             '</svg>',
+                    
+
+        //         // content: '<svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg"><path d="M15,40C6.71572875,40,0,33.2842712,0,25C0,16.7157288,6.71572875,10,15,10C23.2842712,10,30,16.7157288,30,25C30,33.2842712,23.2842712,40,15,40ZM15,20C8.28643375,20,3,15.2864338,3,8C3,0.71356617,8.28643375,0,15,0C21.7135662,0,27,0.71356617,27,8C27,15.2864338,21.7135662,20,15,20Z" fill="blue"/></svg>',
+        //         // content: '<svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg"><path d="M15,40C6.71572875,40,0,33.2842712,0,25C0,16.7157288,6.71572875,10,15,10C23.2842712,10,30,16.7157288,30,25C30,33.2842712,23.2842712,40,15,40ZM15,0C8.28643375,0,3,5.28643375,3,12C3,18.7135662,8.28643375,24,15,24C21.7135662,24,27,18.7135662,27,12C27,5.28643375,21.7135662,0,15,0Z" fill="white"/><path d="M15,20C12.790861,20,11,18.209139,11,16C11,13.790861,12.790861,12,15,12C17.209139,12,19,13.790861,19,16C19,18.209139,17.209139,20,15,20Z" fill="blue"/></svg>',
+        //         size: new naver.maps.Size(24, 24),
+        //         anchor: new naver.maps.Point(12, 12)
+        //     }
+        // });
+
+
+        var icon1 = {
+            content: '<svg width="20" height="20"> '+
+                '<circle cx="10" cy="10" r="10" fill=' + colorList[areaArr[i].color] + '/>' +
+                '<circle cx="10" cy="10" r="5" fill="white" /> '+
+                '<circle cx="12" cy="10" r="1" fill="black" /> '+
+                '<circle cx="8" cy="10" r="1" fill="black" /> '+
+                '</svg>',
+            size: new naver.maps.Size(24, 24),
+            anchor: new naver.maps.Point(12, 12)
+        };
+
+        var icon2 = {
+            content: '<svg width="30" height="30"> '+
+                '<rect x="3" y="3" width="24" height="24" fill=' + colorList[areaArr[i].color] + '/>' +
+                '<rect x="5" y="5" width="20" height="20" fill="white" /> '+
+                '<rect x="7" y="7" width="16" height="16" fill="black" /> '+
+                '</svg>',
+            size: new naver.maps.Size(24, 24),
+            anchor: new naver.maps.Point(15, 15)
+        };
+
+        var icon = areaArr[i].location.startsWith('new') ? icon2 : icon1;
+
         var marker = new naver.maps.Marker({
             title: areaArr[i].location, // 지역구 이름 
-            position: new naver.maps.LatLng(areaArr[i].lat , areaArr[i].lng), // 지역구의 위도 경도 넣기 
+            position: new naver.maps.LatLng(areaArr[i].lat, areaArr[i].lng), // 지역구의 위도 경도 넣기 
             map: map,
-            icon: {
-                // content: '<svg width="28" height="37" viewBox="0 0 28 37" xmlns="http://www.w3.org/2000/svg"><path d="M14 0C6.268 0 0 6.268 0 14c0 7.732 6.268 14 14 14 7.732 0 14-6.268 14-14C28 6.268 21.732 0 14 0zM14 26.946c-4.135 0-7.5-3.365-7.5-7.5s3.365-7.5 7.5-7.5 7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5z" fill="#ff00ff"/></svg>',
-                // content: '<svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg"> <path d="M15,0L15,40L30,20Z" fill="blue"/></svg>',
-
-                // content: '<svg width="24" height="24" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg"> <path d="M15,40C6.71572875,40,0,33.2842712,0,25C0,16.7157288,6.71572875,10,15,10C23.2842712,10,30,16.7157288,30,25C30,33.2842712,23.2842712,40,15,40ZM15,10L15,0L15,10Z" '+
-                //     'fill=' + colorList[areaArr[i].color] + '/> </svg>',
-
-                // content: '<div style="background-color:'+'#ffa500'+';">'+areaArr[i].location+'</div>',
-                    
-                content: '<svg width="20" height="20"> '+
-                    '<circle cx="10" cy="10" r="10" fill=' + colorList[areaArr[i].color] + '/>' +
-                    '<circle cx="10" cy="10" r="5" fill="white" /> '+
-                    '<circle cx="12" cy="10" r="1" fill="black" /> '+
-                    '<circle cx="8" cy="10" r="1" fill="black" /> '+
-                    '</svg>',
-                    
-
-                // content: '<svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg"><path d="M15,40C6.71572875,40,0,33.2842712,0,25C0,16.7157288,6.71572875,10,15,10C23.2842712,10,30,16.7157288,30,25C30,33.2842712,23.2842712,40,15,40ZM15,20C8.28643375,20,3,15.2864338,3,8C3,0.71356617,8.28643375,0,15,0C21.7135662,0,27,0.71356617,27,8C27,15.2864338,21.7135662,20,15,20Z" fill="blue"/></svg>',
-                // content: '<svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg"><path d="M15,40C6.71572875,40,0,33.2842712,0,25C0,16.7157288,6.71572875,10,15,10C23.2842712,10,30,16.7157288,30,25C30,33.2842712,23.2842712,40,15,40ZM15,0C8.28643375,0,3,5.28643375,3,12C3,18.7135662,8.28643375,24,15,24C21.7135662,24,27,18.7135662,27,12C27,5.28643375,21.7135662,0,15,0Z" fill="white"/><path d="M15,20C12.790861,20,11,18.209139,11,16C11,13.790861,12.790861,12,15,12C17.209139,12,19,13.790861,19,16C19,18.209139,17.209139,20,15,20Z" fill="blue"/></svg>',
-                size: new naver.maps.Size(24, 24),
-                anchor: new naver.maps.Point(12, 12)
-            }
+            icon: icon
         });
 
 
@@ -169,6 +202,29 @@ function initMap() {
     //   console.log(markers[i] , getClickHandler(i));
       naver.maps.Event.addListener(markers[i], 'click', getClickHandler(i)); // 클릭한 마커 핸들러
   }
+
+  naver.maps.Event.addListener(map, 'click', function(e) {
+      var latlng = e.latlng;
+
+    //   console.log('latlng:', latlng)
+
+      address = "To be done"
+
+        var mapList = "";
+        // mapList += "<tr>"
+        // mapList += "	<td>" + address + "</td>"
+        // mapList += "	<td>" + latitude + "</td>"
+        // mapList += "	<td>" + longitude + "</td>"
+        // mapList += "</tr>"
+        mapList += "주소: <br>" + address + "<br><br>"
+        + "위도:	<br>" + latlng.y + "<br><br>"
+        + "경도:	<br>" + latlng.x + "<br><br>"
+
+        // $('#mapList').append(mapList);	
+        //  $('#mapList').html(mapList);	
+        $('#mapList').empty().append(mapList);	
+
+    });
 }
 
 
@@ -197,9 +253,35 @@ function searchAddressToCoordinate(address) {
         }
 
         insertAddress(item.roadAddress, item.x, item.y);
+        displayMarker(item.roadAddress, item.x, item.y);
         
     });
 }
+
+
+function displayMarker(roadAddress, x, y) {
+    // 마커를 생성합니다.
+    if (userMarker == null) {
+        userMarker = new naver.maps.Marker({
+            position: new naver.maps.LatLng(y, x),
+            map: map
+        });
+    }
+    else {
+        userMarker.setPosition(new naver.maps.LatLng(y, x))
+    }
+    // 마커 클릭 시 정보창을 표시합니다.
+    naver.maps.Event.addListener(userMarker, 'click', function() {
+        var infoWindow = new naver.maps.InfoWindow({
+            content: roadAddress
+        });
+        infoWindow.open(map, userMarker);
+    });
+
+    naver.maps.Event.trigger(userMarker, "click");
+
+}
+
 
 function searchMarker(name) {
     for (var i = 0; i < markers.length; i++) {
@@ -247,11 +329,14 @@ $('#submit').on('click', function(e) {
 //검색정보를 테이블로 작성해주고, 지도에 마커를 찍어준다.
 function insertAddress(address, latitude, longitude) {
 	var mapList = "";
-	mapList += "<tr>"
-	mapList += "	<td>" + address + "</td>"
-	mapList += "	<td>" + latitude + "</td>"
-	mapList += "	<td>" + longitude + "</td>"
-	mapList += "</tr>"
+	// mapList += "<tr>"
+	// mapList += "	<td>" + address + "</td>"
+	// mapList += "	<td>" + latitude + "</td>"
+	// mapList += "	<td>" + longitude + "</td>"
+	// mapList += "</tr>"
+	mapList += "주소: <br>" + address + "<br><br>"
+	+ "위도:	<br>" + latitude + "<br><br>"
+	+ "경도:	<br>" + longitude + "<br><br>"
 
 	// $('#mapList').append(mapList);	
 	//  $('#mapList').html(mapList);	
@@ -320,32 +405,6 @@ function moveMap(lon, lat) {
     //     map: map
     // });
 }
-
-
-function search(query) {
-  const endpoint = 'https://naveropenapi.apigw.ntruss.com/map-place/v1/search';
-  const params = {
-    query: query,
-    type: 'building', // search for buildings only
-  };
-  const queryString = Object.entries(params).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
-  const url = `${endpoint}?${queryString}`;
-  
-  const headers = new Headers();
-  const API_KEY_ID = 'xrv3qxunpk ';
-  const API_KEY = '3waRg77cyWgk9bZCx3mkrEqJ9fdNOPfoY4CYUhJa ';
-  headers.append('X-NCP-APIGW-API-KEY-ID', API_KEY_ID);
-  headers.append('X-NCP-APIGW-API-KEY', API_KEY_ID);
-
-  return fetch(url, { headers })
-    .then(response => response.json())
-    .then(data => data.places);
-}
-
-
-// search('City Hall').then(places => {
-//   console.log(places); // an array of places matching the search query
-// });
 
 
 </script>
