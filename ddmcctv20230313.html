@@ -169,6 +169,14 @@ function initMap() {
             size: new naver.maps.Size(24, 24),
             anchor: new naver.maps.Point(15, 27)
         };
+        var icon4 = {
+            content: '<svg width="30" height="30"> '+
+                '<path d="M15 27 L3 3 L27 3 Z" fill=' + "magenta" + ' />' +
+                '<circle cx="15" cy="27" r="2" fill="black" /> '+
+                '</svg>',
+            size: new naver.maps.Size(24, 24),
+            anchor: new naver.maps.Point(15, 27)
+        };
         var icon3 = {
             content: '<svg width="30" height="30"> '+
                 '<path d="M15 27 L3 3 L27 3 Z" fill=' + "yellow" + ' />' +
@@ -181,6 +189,9 @@ function initMap() {
 
         if (areaArr[i].location.startsWith('new')) {
             var icon = icon2;
+        }
+        else if (areaArr[i].location.startsWith('neo')) {
+            var icon = icon4;
         }
         else if (areaArr[i].location.startsWith('school')) {
             var icon = icon3;
